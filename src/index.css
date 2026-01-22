@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --shadow-neo: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-neo-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+
+body {
+  background-color: #FFDE59; /* Bright Yellow Background */
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}

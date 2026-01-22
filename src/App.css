@@ -1,0 +1,27 @@
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+body {
+  margin: 0;
+  background-color: #f1f5f9; /* Slate 100 */
+}
+
+/* This helps the mobile view stay centered on a big monitor */
+.app-container {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f1f5f9;
+}
+
+.mobile-frame {
+  width: 100%;
+  max-width: 450px;
+  background-color: white;
+  min-height: 100vh;
+  box-shadow: 0 0 50px rgba(0,0,0,0.1);
+}
