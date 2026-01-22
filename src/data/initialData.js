@@ -5,7 +5,7 @@ export const initialData = {
   accommodations: [
     { id: 1, address: "Terazije 12, Beograd", type: "Nuran/Shams/Furkan" },
     { id: 2, address: "Svetozara Radića 9, Beograd", type: "Fatya/Eren" },
-    { id: 3, address: "...", type: "Diğer Arkolar" }
+    { id: 3, address: "...", type: "Diger Arkolar" }
   ],
   itinerary: {
     1: [
