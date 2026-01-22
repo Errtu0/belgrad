@@ -4,6 +4,10 @@ import { TripContext } from '../context/TripContext';
 import TimelineItem from '../components/TimelineItem';
 import { ChevronLeft, Plus } from 'lucide-react';
 
+// DND Kit Imports
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
 export default function TimelinePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,10 +15,30 @@ export default function TimelinePage() {
   const dayId = parseInt(id);
   const items = tripData.itinerary[dayId] || [];
 
+  // Setup Sensors for DND
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // Handle Input Changes (Time, Title, Notes)
   const handleEdit = (index, field, value) => {
     const newItinerary = { ...tripData.itinerary };
-    newItinerary[dayId][index][field] = value;
+    newItinerary[dayId][index] = { ...newItinerary[dayId][index], [field]: value };
     setTripData({ ...tripData, itinerary: newItinerary });
+  };
+
+  // Handle Drag & Drop Result
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      
+      const newItinerary = { ...tripData.itinerary };
+      newItinerary[dayId] = arrayMove(items, oldIndex, newIndex);
+      setTripData({ ...tripData, itinerary: newItinerary });
+    }
   };
 
   const handleDelete = (index) => {
@@ -70,20 +94,28 @@ export default function TimelinePage() {
         </div>
 
         <div className="space-y-2">
-          {items.length > 0 ? (
-            items.map((item, idx) => (
-              <TimelineItem 
-                key={item.id} 
-                item={item} 
-                onEdit={(field, val) => handleEdit(idx, field, val)}
-                onDelete={() => handleDelete(idx)}
-              />
-            ))
-          ) : (
-            <div className="bg-white/50 border-4 border-dashed border-black p-10 text-center font-black uppercase text-slate-600 mb-6">
-              Nothing planned yet!
-            </div>
-          )}
+          <DndContext 
+            sensors={sensors} 
+            collisionDetection={closestCenter} 
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+              {items.length > 0 ? (
+                items.map((item, idx) => (
+                  <TimelineItem 
+                    key={item.id} 
+                    item={item} 
+                    onEdit={(field, val) => handleEdit(idx, field, val)}
+                    onDelete={() => handleDelete(idx)}
+                  />
+                ))
+              ) : (
+                <div className="bg-white/50 border-4 border-dashed border-black p-10 text-center font-black uppercase text-slate-600 mb-6">
+                  Nothing planned yet!
+                </div>
+              )}
+            </SortableContext>
+          </DndContext>
           
           <button 
             onClick={addNewCustomItem}
